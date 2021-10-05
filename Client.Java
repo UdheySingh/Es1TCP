@@ -2,66 +2,49 @@ import java.io.*;
 import java.net.*;
 
 public class Client {
-    int portaServer = 7777;
-    Socket mySocket;
-    BufferedReader input;
-    String stringaUtente;
-    String StringaDaServer;
-    DataOutputStream outVersoServer;
-    BufferedReader inDalServer;
-    
-    public Socket connetti(){
-      System.out.println("(2) CLIENT partito in esecuzione");
-      try{
-          input =new BufferedReader(new InputStreamReader(System.in));
-          mySocket= new Socket(InetAddress.getLocalHost(), portaServer);
-          outVersoServer= new DataOutputStream(mySocket.getOutputStream());
-          inDalServer= new BufferedReader(new InputStreamReader(mySocket.getInputStream()));     
-      }
-      catch (UnknownHostException e){
-          System.err.println("Host sconosciuto");
-      }
-      catch (Exception e){
-          System.out.println(e.getMessage());
-          System.out.println("Errore durante la connessione!");
-          System.exit(1); 
-      }
-      return mySocket;
+    String nomeServer = "localhost";
+    int portaServer = 6789;
+    Socket socket;
+    BufferedReader tastiera;
+    String StringUser;
+    String StringReply;
+    DataInputStream in;
+    DataOutputStream out;   
+
+    protected Socket connetti() throws IOException
+    {
+        try{
+            tastiera = new BufferedReader( new InputStreamReader(System.in));
+            socket = new Socket(nomeServer, portaServer);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new DataInputStream(socket.getInputStream());
+        }catch (UnknownHostException a){
+            System.err.println("");
+        }catch (Exception e){
+            System.out.println("");
+            System.exit(1);
+        }
+        System.out.println(InetAddress.getLocalHost());
+        return socket;
     }
-    
     public void comunica(){
-      try{
-          System.out.println("(4) Scrivi il primo operatore" + '\n');
-          stringaUtente= input.readLine();
-          System.out.println("(5) Invio operatore");
-          outVersoServer.writeBytes(stringaUtente + '\n');
-          
-          System.out.println("(7) Scrivi il secondo operatore" + '\n');
-          stringaUtente= input.readLine();
-          System.out.println("(8) Invio operatore");
-          outVersoServer.writeBytes(stringaUtente + '\n');
-          
-          System.out.println("(10) Scrivi l'operando (+,-,/,*)" + '\n');
-          stringaUtente= input.readLine();
-          System.out.println("(11) Invio operando");
-          outVersoServer.writeBytes(stringaUtente + '\n');
-          
-          StringaDaServer = inDalServer.readLine();
-          System.out.println("(13) Risposta del server" + StringaDaServer);
-          System.out.println("(14) Chiusura connesione");
-          mySocket.close();
-      }
-      catch(Exception e)
-      {
-          System.out.println(e.getMessage());
-          System.out.println("Errore durante la comunicazione col server!");
-          System.exit(1);
-      }
+        try{
+            System.out.println("4 Inserisci stringa da modificare: "+'\n');
+            StringUser = tastiera.readLine();
+            System.out.println("5 Invio stringa al server e attendo...");
+            out.writeBytes(StringUser+'\n');
+            StringReply = in.readLine();
+            System.out.println("... risposta dal server "+ '\n'+StringReply);
+            System.out.println("9 CLI: terminata belaborazione chiusura connessione");
+            socket.close();
+        }catch (Exception e){
+            System.exit(1);
+        }
     }
-  
-    public static void main (String args[]){
-      Client client= new Client();
-      client.connetti();
-      client.comunica();
-    } 
+    public static void main( String[] args ) throws IOException
+    {
+        client client1 = new client();
+        client1.connetti();
+        client1.comunica();
+    }
 }

@@ -1,84 +1,55 @@
 import java.io.*;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-public class Server {
+public class Server
+{
     ServerSocket server = null;
     Socket client = null;
-    String op1;
-    double op1d;
-    String op2;
-    double op2d;
-    char op;
-    double ris;
-    String risposta;
+    String StringRV = null;
+    String StringMD = null;
     BufferedReader inDalClient;
     DataOutputStream outVersoClient;
-    
-    public Socket attendi(){
-        try{
-            System.out.println("(1) SERVER partito in esecuzione");
-            server = new ServerSocket(7777);
+    public Server()
+    {
+        
+    }
+    public Socket attendi()
+    {
+        try {
+            String ind = InetAddress.getLocalHost().getHostAddress();
+            System.out.println("Server partito in esecuzione..."+ind);
+            server = new ServerSocket(6789);
             client = server.accept();
             server.close();
-            inDalClient = new BufferedReader(new InputStreamReader (client.getInputStream()));
-            outVersoClient = new DataOutputStream(client.getOutputStream());
-        }
-        catch(Exception e){
+            inDalClient = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            outVersoClient = new DataOutputStream( client.getOutputStream());
+        } catch (Exception e) {
             System.out.println(e.getMessage());
-            System.out.println("Errore durante l'istanza del server!");
-            System.out.println(1);
+            System.out.println("errore durante l'istanza del server");
+            System.exit(1);
         }
         return client;
     }
-    
-    public void comunica(){
-        try{            
-            op1 = inDalClient.readLine();
-            System.out.println("(3) Primo operando ricevuto");
-            op2 = inDalClient.readLine();
-            System.out.println("(6) Secondo operando ricevuto");
-            op = (char) inDalClient.read();
-            System.out.println("(9) Operatore ricevuto");
-                        
-            op1d = Double.parseDouble(op1);
-            op2d = Double.parseDouble(op2);
-            
-            switch(op){
-                case '+':
-                    ris = op1d + op2d;
-                    risposta = Double.toString(ris);
-                    break;
-                case '-':
-                    ris = op1d - op2d;
-                    risposta = Double.toString(ris);
-                    break;    
-                case '/':
-                    ris = op1d / op2d;
-                    risposta = Double.toString(ris);
-                    break;
-                case '*':
-                    ris = op1d * op2d;
-                    risposta = Double.toString(ris);
-                    break;
-                default:
-                    risposta = "Operatore non valido";                
-            }
-            
-            //OUTPUT AL CLIENT 
-            System.out.println("(12) Invio risposta al client");
-            outVersoClient.writeBytes(risposta + '\n');
-            System.out.println("(14) Fine elaborazione");
-            client.close();
-        }
-        catch(Exception e){
-           System.out.println(e.getMessage());
-        }
-    }
+    public void comunica() {
+        try{
+        System.out.println("3 Benvenuto client, scrivi la frase da trasformare in maiuscolo. Attendo...");
+        StringRV = inDalClient.readLine();
+        System.out.println("6 ricevuta la stringa dal CLI:"+StringRV);
+        StringMD = StringRV.toUpperCase();
+        System.out.println("7 Invio stringa modificata al CLI...");
+        outVersoClient.writeBytes(StringMD+'\n');
+        System.out.println("9 Server: elaborazione terminata ...");
+        client.close();
+        }catch(Exception e){
 
-    public static void main(String args[]){
-        Server server = new Server();
-        server.attendi();
-        server.comunica();
+        }
     }
-    
+    public static void main( String[] args )
+    {
+        ServerSrv server1 = new ServerSrv();
+        server1.attendi();
+        server1.comunica();
+    }
 }
