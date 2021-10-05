@@ -48,7 +48,7 @@ public class Server
     }
     public static void main( String[] args )
     {
-        ServerSrv server1 = new ServerSrv();
+        Server server1 = new Server();
         server1.attendi();
         server1.comunica();
     }
